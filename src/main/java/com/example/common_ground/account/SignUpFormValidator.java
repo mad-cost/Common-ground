@@ -23,7 +23,7 @@ public class SignUpFormValidator implements Validator {
   @Override
   public void validate(Object target, Errors errors) {
     // TODO email, nickname이 중복 되는지 검사하기
-    // SignUpForm에 대한 errors
+    // if()를 통해서 SignUpForm에 대한 errors 처리
     //@PostMapping("/sign-up")에서 사용
     SignUpForm signUpForm = (SignUpForm)target;
     if (accountRepository.existsByEmail(signUpForm.getEmail())) {
@@ -43,6 +43,7 @@ public class SignUpFormValidator implements Validator {
       따라서 일반적으로는 폼 데이터의 유효성 검사와 관련된 오류 처리에는 errors.rejectValue()를 사용하는 것이 권장된다.
        */
     }
+
     if (accountRepository.existsByNickname(signUpForm.getNickname())){
       errors.rejectValue(
               "nickname",

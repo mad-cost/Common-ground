@@ -7,6 +7,7 @@ import com.example.common_ground.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
@@ -18,12 +19,15 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class AccountController {
   private final SignUpFormValidator signUpFormValidator;
   private final AccountService accountService;
+  private final AccountRepository accountRepository;
 
   
   @GetMapping("/")
@@ -40,7 +44,6 @@ public class AccountController {
     model.addAttribute("signUpForm", new SignUpForm());
     return "account/sign-up";
   }
-
 
   @InitBinder("signUpForm")
   /* @InitBinder("signUpForm"):
@@ -67,15 +70,42 @@ public class AccountController {
        ↑이 부분을 @Valid SignUpForm에서 @InitBinder를 사용하여 검증 할 수 있다
      */
 
+    // 회원 가입에 문제가 없다면 진행
     accountService.processNewAccount(signUpForm);
 
     // 회원 가입 성공
     return "redirect:/";
   }
 
+  @GetMapping("/check-email-token")
+  public String checkEmailToken(
+          String token,
+          String email,
+          Model model
+  ){
+    // 이메일에 해당하는 유저 검증
+    Account account = accountRepository.findByEmail(email);
+    String view = "account/checked-email";
 
+    if (account == null){
+      model.addAttribute("error", "wrong.email");
+      return view;
+    }
+    // 이메일이 null이 아니지만 / DB의 토큰과 받은 값의 토큰이 같지 않다면 오류
+    if(!account.getEmailCheckToken().equals(token)){
+      model.addAttribute("error", "wrong.token");
+      return view;
+    }
 
-
-
+    // @ account(유저)가 검증 됐다면
+    // 검증된 계정
+    account.setEmailVerified(true);
+    // 가입 날짜
+    account.setJoinedAt(LocalDateTime.now());
+    // 몇 번째 가입 계정인가
+    model.addAttribute("numberOfUser", accountRepository.count());
+    model.addAttribute("nickname", account.getNickname());
+    return view;
+  }
 
 }
