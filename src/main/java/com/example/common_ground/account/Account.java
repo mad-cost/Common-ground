@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -52,4 +53,9 @@ public class Account {
   // 스터디 수정 정보, 웹으로 알림 받기
   private boolean studyUpdateByWeb;
 
+  // 가입된 정보로 토큰 생성
+  public void generateEmailCheckToken() {
+    // UUID를 사용해서 랜덤으로 문자열 값 생성
+    this.emailCheckToken = UUID.randomUUID().toString();
+  }
 }
