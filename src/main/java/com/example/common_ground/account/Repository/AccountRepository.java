@@ -1,6 +1,6 @@
 package com.example.common_ground.account.Repository;
 
-import com.example.common_ground.account.Account;
+import com.example.common_ground.account.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 

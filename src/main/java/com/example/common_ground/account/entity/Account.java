@@ -1,4 +1,4 @@
-package com.example.common_ground.account;
+package com.example.common_ground.account.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
