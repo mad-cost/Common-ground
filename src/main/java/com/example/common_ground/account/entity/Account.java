@@ -60,4 +60,18 @@ public class Account {
     // UUID를 사용해서 emailCheckToken(이메일 검증시 사용할 토큰)에 랜덤으로 문자열 값 생성
     this.emailCheckToken = UUID.randomUUID().toString();
   }
+
+  public void completeSignUp() {
+    // 검증된 계정
+    this.emailVerified = true;
+    // account.setEmailVerified(true); -> @Controller에서 메서드로 빼기 전 상태
+
+    // 가입 날짜
+    this.joinedAt = LocalDateTime.now();
+    // account.setJoinedAt(LocalDateTime.now());
+  }
+
+  public boolean isValidToken(String token) {
+    return this.emailCheckToken.equals(token);
+  }
 }

@@ -17,6 +17,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -31,14 +32,30 @@ public class AccountControllerTest {
   @MockBean
   JavaMailSender javaMailSender;
 
+  @DisplayName("인증 메일 확인 - 입력값 오류")
+  @Test
+  void checkEmailToken_with_wrong_input() throws Exception {
+    mockMvc.perform(get("/check-email-token")
+                    .param("token", "sdfjslwfwef")
+                    .param("email", "email@email.com"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("error"))
+            .andExpect(view().name("account/checked-email"))
+            .andExpect(unauthenticated());
+  }
+
   // 테스트 메서드의 이름을 지정
   @DisplayName("회원 가입 화면 보이는지 테스트")
   @Test
-  void  signUpForm() throws Exception {
+  void signUpForm() throws Exception {
     mockMvc.perform(get("/sign-up"))
+            .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(view().name("account/sign-up"));
+            .andExpect(view().name("account/sign-up"))
+            .andExpect(model().attributeExists("signUpForm"))
+            .andExpect(unauthenticated());
   }
+
 
   @DisplayName("회원 가입 처리 - 입력값 오류")
   @Test
@@ -66,7 +83,6 @@ public class AccountControllerTest {
             // 회원 가입 성공시 이동하는 뷰
             .andExpect(view().name("redirect:/"))
             .andExpect(authenticated().withUsername("testJun"));
-
   }
 
 

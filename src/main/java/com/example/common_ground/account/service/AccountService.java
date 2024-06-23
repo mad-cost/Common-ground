@@ -7,9 +7,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +25,7 @@ public class AccountService {
   private final AccountRepository accountRepository;
   private final JavaMailSender javaMailSender;
   private final PasswordEncoder passwordEncoder;
+//  private final AuthenticationManager authenticationManager;
 
 
 
@@ -28,11 +37,12 @@ public class AccountService {
   즉, generateEmailCheckToken()에서 this.emailCheckToken에 값을 넣어줄 경우 DB에 저장이 된다.
    */
   @Transactional
-  public void processNewAccount(SignUpForm signUpForm){
+  public Account processNewAccount(SignUpForm signUpForm){
     Account newAccount = saveNewAccount(signUpForm);
     // 가입 성공시 토큰 생성
     newAccount.generateEmailCheckToken();
     sendSignUpConfirmEmail(newAccount);
+    return newAccount;
   }
 
   private Account saveNewAccount(@Valid SignUpForm signUpForm) {
@@ -56,7 +66,7 @@ public class AccountService {
     mailMessage.setTo(newAccount.getEmail());
     // 메일 제목
     mailMessage.setSubject("스터디올래, 회원 가입 인증");
-    // 메일 본문 url / setText: url로 들어오는 값
+    // 메일 본문 url / setText: 터미널 ConsoleMailSender에 들어오는 값
     mailMessage.setText(
             "/check-email-token?token=" + newAccount.getEmailCheckToken()
                     + "&email=" + newAccount.getEmail());
@@ -65,7 +75,31 @@ public class AccountService {
   }
 
 
+  public void login(Account account) {
+    // 이렇게 작성하면 실제로 AuthenticationManager가 하는 일과 같다고 볼 수 있다
+    // 이렇게 한 이유는 Password를 encoding한 패스워드 밖에 접근하지 못하기 때문
+    // 정석적인 방법은 Claim텍스트로 받은 비밀번호를 사용해야 한다.
+
+    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+            // 3개의 값이 와야한다.
+            account.getNickname(), // 1. Principal
+            account.getPassword(), // 2. Password
+            List.of(new SimpleGrantedAuthority("ROLE_USER"))); // 3. 권한
+    SecurityContextHolder.getContext().setAuthentication(token);
+
+    /* SecurityContextHolder의 getContext()에서 Authentication설정이 가능하다
+    SecurityContext context = SecurityContextHolder.getContext();
+    context.setAuthentication(token); // 권한 설정
+    context.getAuthentication(); // 권한 보기
+    */
 
 
-
+    /* 토큰 인증 정석적인 방법
+    UsernamePasswordAuthenticationToken standardToken = new UsernamePasswordAuthenticationToken(
+            username, password);
+    Authentication authentication = authenticationManager.authenticate(standardToken);
+    SecurityContext context = SecurityContextHolder.getContext();
+    context.setAuthentication(authentication);
+     */
+  }
 }
