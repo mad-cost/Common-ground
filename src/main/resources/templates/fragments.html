@@ -74,13 +74,14 @@
         <!--  프로필 토글  -->
         <div class="dropdown-menu dropdown-menu-sm-right" aria-labelledby="userDropdown">
           <h6 class="dropdown-header">
-            <!--  AccountService.login()의 '1. Principal' 값  -->
+            <!--  TODO AccountService.login()의 '1. Principal' 값  / 로그인시 토글에 Username으로 표기해 준다 -->
             <span sec:authentication="name">Username</span>
           </h6>
           <a class="dropdown-item" th:href="@{'/profile/' + ${#authentication.name}}">프로필</a>
           <a class="dropdown-item" >스터디</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#" th:href="@{'/settings/profile'}">설정</a>
+<!--  Config의 .logout(formLogout -> formLogout.logoutSuccessUrl("/"))에 의해 동작해서 "/"로 이동 -->
           <form class="form-inline my-2 my-lg-0" action="#" th:action="@{/logout}" method="post">
             <button class="dropdown-item" type="submit">로그아웃</button>
           </form>
@@ -97,5 +98,27 @@
     <small class="d-block mb-3 text-muted">&copy; 2020</small>
   </div>
 </footer>
+
+<script type="application/javascript" th:fragment="form-validation">
+    (function () {
+        'use strict';
+
+        window.addEventListener('load', function () {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+
+            // Loop over them and prevent submission
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        }, false)
+    }())
+</script>
 
 </html>

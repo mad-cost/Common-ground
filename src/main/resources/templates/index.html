@@ -5,13 +5,8 @@
 
 <!-- fragments.html 중복 코드 제거-->
 <head th:replace="fragments.html :: head"></head>
-
 <body class="bg-light">
-
-<!-- fragments.html 중복 코드 제거-->
-<div th:replace="fragments.html :: main-nav"></div>>
-
-<!-- 오류 -->
+<div th:replace="fragments.html :: main-nav"></div>
 <div class="alert alert-warning" role="alert" th:if="${account != null && !account.emailVerified}">
   스터디올레 가입을 완료하려면 <a href="#" th:href="@{/check-email}" class="alert-link">계정 인증 이메일을 확인</a>하세요.
 </div>
@@ -34,26 +29,5 @@
 <!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>-->
 <!--<script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>-->
 
-<script type="application/javascript">
-    (function () {
-        'use strict';
-
-        window.addEventListener('load', function () {
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            var forms = document.getElementsByClassName('needs-validation');
-
-            // Loop over them and prevent submission
-            Array.prototype.filter.call(forms, function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated')
-                }, false)
-            })
-        }, false)
-    }())
-</script>
 </body>
 </html>

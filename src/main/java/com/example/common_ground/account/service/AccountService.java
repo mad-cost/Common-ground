@@ -3,6 +3,7 @@ package com.example.common_ground.account.service;
 import com.example.common_ground.account.Repository.AccountRepository;
 import com.example.common_ground.account.SignUpForm;
 import com.example.common_ground.account.entity.Account;
+import com.example.common_ground.account.entity.UserAccount;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,6 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +25,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService {
+public class AccountService implements UserDetailsService {
   private final AccountRepository accountRepository;
   private final JavaMailSender javaMailSender;
   private final PasswordEncoder passwordEncoder;
@@ -59,20 +63,25 @@ public class AccountService {
   }
 
 
-  private void sendSignUpConfirmEmail(Account newAccount) {
-    // 이메일 보내기
-    SimpleMailMessage mailMessage = new SimpleMailMessage();
-    // 받는 사람 이메일
-    mailMessage.setTo(newAccount.getEmail());
-    // 메일 제목
-    mailMessage.setSubject("스터디올래, 회원 가입 인증");
-    // 메일 본문 url / setText: 터미널 ConsoleMailSender에 들어오는 값
-    mailMessage.setText(
-            "/check-email-token?token=" + newAccount.getEmailCheckToken()
-                    + "&email=" + newAccount.getEmail());
-    //ConsoleMailSender클래스의 send메서드에서 로그를 만들어 주면 된다.
-    javaMailSender.send(mailMessage);
-  }
+//  private void sendSignUpConfirmEmail(Account newAccount) {
+//    // 이메일 보내기
+//    SimpleMailMessage mailMessage = new SimpleMailMessage();
+//    // 받는 사람 이메일
+//    mailMessage.setTo(newAccount.getEmail());
+//    // 메일 제목
+//    mailMessage.setSubject("스터디올래, 회원 가입 인증");
+//    // 메일 본문 url / setText: 터미널 ConsoleMailSender에 들어오는 값
+//    mailMessage.setText(
+//            "/check-email-token?token=" + newAccount.getEmailCheckToken()
+//                    + "&email=" + newAccount.getEmail());
+//    //ConsoleMailSender클래스의 send메서드에서 로그를 만들어 주면 된다.
+//    javaMailSender.send(mailMessage);
+//  }
+public void sendSignUpConfirmEmail(Account newAccount) {
+  SimpleMailMessage mailMessage = new SimpleMailMessage();
+  mailMessage.setTo(newAccount.getEmail());
+  mailMessage.setSubject("스터디올래, 회원 가입 인증");
+}
 
 
   public void login(Account account) {
@@ -81,8 +90,10 @@ public class AccountService {
     // 정석적인 방법은 Claim텍스트로 받은 비밀번호를 사용해야 한다.
 
     UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+
             // 3개의 값이 와야한다.
-            account.getNickname(), // 1. Principal
+//            account.getNickname(), // 1. Principal
+            new UserAccount(account),
             account.getPassword(), // 2. Password
             List.of(new SimpleGrantedAuthority("ROLE_USER"))); // 3. 권한
     SecurityContextHolder.getContext().setAuthentication(token);
@@ -101,5 +112,21 @@ public class AccountService {
     SecurityContext context = SecurityContextHolder.getContext();
     context.setAuthentication(authentication);
      */
+  }
+
+  // Config에서 .formLogin(formLogin -> " ")을 사용하기 위해 필요
+  @Override
+  public UserDetails loadUserByUsername(String emailOrNickname) throws
+          UsernameNotFoundException {
+    Account account = accountRepository.findByEmail(emailOrNickname);
+    if (account == null) {
+      account = accountRepository.findByNickname(emailOrNickname);
+    }
+    // email과 nickname이 모두 null이라면 예외 발생
+    if (account == null) {
+      throw new UsernameNotFoundException(emailOrNickname);
+    }
+    // 값이 있을 경우 Principal에 해당하는 객체 반환
+    return new UserAccount(account);
   }
 }

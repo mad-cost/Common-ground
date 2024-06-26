@@ -32,6 +32,8 @@ public class Account {
   private boolean emailVerified;
   // 이메일 검증시 사용할 토큰
   private String emailCheckToken;
+  private LocalDateTime emailCheckTokenGeneratedAt;
+
 
   private LocalDateTime joinedAt;   // 가입 날짜
   private String bio;   // 자기 소개
@@ -59,6 +61,7 @@ public class Account {
   public void generateEmailCheckToken() {
     // UUID를 사용해서 emailCheckToken(이메일 검증시 사용할 토큰)에 랜덤으로 문자열 값 생성
     this.emailCheckToken = UUID.randomUUID().toString();
+    this.emailCheckTokenGeneratedAt = LocalDateTime.now();
   }
 
   public void completeSignUp() {
@@ -73,5 +76,9 @@ public class Account {
 
   public boolean isValidToken(String token) {
     return this.emailCheckToken.equals(token);
+  }
+
+  public boolean canSendConfirmEmail() {
+    return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
   }
 }

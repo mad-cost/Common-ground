@@ -16,11 +16,10 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http)
           throws Exception {
     http
-            .authorizeHttpRequests((authz) -> authz
+            .authorizeHttpRequests((auth) -> auth
                             .requestMatchers("/",
                                     "/login",
                                     "/sign-up",
-                                    "/check-email-token",
                                     "/email-login",
                                     "/check-email-login",
                                     "/login-link").permitAll() // 누구나 접근 가능
