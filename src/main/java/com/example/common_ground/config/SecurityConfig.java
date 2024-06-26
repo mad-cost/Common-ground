@@ -39,6 +39,8 @@ public class SecurityConfig {
 //.logout(withDefaults()); // 기본 로그아웃 설정
     return http.build();
   }
+
+
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring()

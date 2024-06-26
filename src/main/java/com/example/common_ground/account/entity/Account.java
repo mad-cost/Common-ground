@@ -33,13 +33,13 @@ public class Account {
   // 이메일 검증시 사용할 토큰
   private String emailCheckToken;
   private LocalDateTime emailCheckTokenGeneratedAt;
-
-
   private LocalDateTime joinedAt;   // 가입 날짜
+
   private String bio;   // 자기 소개
   private String url;   // 웹사이트 url
   private String occupation;   // 직업
   private String location;   // 거주지
+
   @Lob // 이미지 크기가 String = varchar(255)를 넘을꺼 같을 경우 사용.
   @Basic(fetch = FetchType.EAGER) // 이 필드에 접근할 때마다 프로필 이미지 데이터를 즉시 가져오겠다는 의미
   private String profileImage;

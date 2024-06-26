@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
   private final AccountRepository accountRepository;
@@ -114,7 +115,9 @@ public void sendSignUpConfirmEmail(Account newAccount) {
      */
   }
 
+
   // Config에서 .formLogin(formLogin -> " ")을 사용하기 위해 필요
+  @Transactional(readOnly = true)
   @Override
   public UserDetails loadUserByUsername(String emailOrNickname) throws
           UsernameNotFoundException {
@@ -129,4 +132,11 @@ public void sendSignUpConfirmEmail(Account newAccount) {
     // 값이 있을 경우 Principal에 해당하는 객체 반환
     return new UserAccount(account);
   }
+
+
+  public void completeSignUp(Account account) {
+    account.completeSignUp();
+    login(account);
+  }
+
 }

@@ -12,10 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
@@ -95,9 +92,11 @@ public class AccountController {
       return view;
     }
 
-    // account가 검증 됐다면
+    accountService.completeSignUp(account);
+    /* account가 검증 됐다면
     account.completeSignUp();
     accountService.login(account);
+     */
 
     // 몇 번째 가입 계정인가
     model.addAttribute("numberOfUser", accountRepository.count());
@@ -123,7 +122,26 @@ public class AccountController {
     return "redirect:/";
   }
 
+// 프로필
+  @GetMapping("/profile/{nickname}")
+  public String viewProfile(
+          @PathVariable
+          String nickname,
+          Model model,
+//        현재 프로필을 보고 있는 유저가 프로필의 주인인지 아닌지 알기 위해
+          @CurrentUser
+          Account account
+  ){
+    Account byNickname = accountRepository.findByNickname(nickname);
+    if (byNickname == null){
+      throw new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다");
+    }
 
+    model.addAttribute(byNickname);
+    model.addAttribute("isOwner", byNickname.equals(account));
+
+    return "account/profile";
+  }
 
 
 
