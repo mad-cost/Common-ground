@@ -12,4 +12,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER) // 메서드 파라미터에 적용될 수 있음
 @AuthenticationPrincipal(expression = "#this == 'anonymousUser' ? null : account")
 public @interface CurrentUser {
+  // CurrentUser: 현재 인증된 사용자를 판별
 }

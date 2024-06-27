@@ -49,10 +49,10 @@ public class AccountController {
 
   @PostMapping("/sign-up")
   public String signUpSubmit(
-          // @ModelAttribute: SignUpForm(복합 객체)의 여러 필드를 받기 위해서 사용
-          @ModelAttribute
           @Valid // 유호성 검사
-          SignUpForm signUpForm,
+          @ModelAttribute
+          // @ModelAttribute: SignUpForm(복합 객체)의 여러 필드를 받기 위해서 사용
+          SignUpForm signUpForm, //  @InitBinder("signUpForm")사용시 실행된다
           Errors errors //바인딩 할 때 일어나는 에러를 잡기 위해 사용
   ){
     // 만약 에러가 있다면 다시 회원 가입 페이지로 이동
@@ -105,7 +105,11 @@ public class AccountController {
   }
 
   @GetMapping("/check-email")
-  public String checkEmail(@CurrentUser Account account, Model model) {
+  public String checkEmail(
+          // @CurrentUser: 인증된 사용자의 정보를 가져오는 데 사용
+          @CurrentUser
+          Account account,
+          Model model) {
     model.addAttribute("email", account.getEmail());
     return "account/check-email";
   }

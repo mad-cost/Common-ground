@@ -69,7 +69,10 @@
            aria-haspopup="true" aria-expanded="false">
           <!-- 프로필 https://jdenticon.com / node_modules가 있는 src=/static에서 install jdenticon 후 사용 가능 -->
           <!-- th:data-jdenticon-value="${#authentication.name}": 스프링 시큐리티와 타임리프를 같이 쓸 때는 authentication.name에 접근이 가능하다  -->
-          <svg data-jdenticon-value="user127" th:data-jdenticon-value="${#authentication.name}" width="24" height="24" class="rounded border bg-light"></svg>
+          <svg th:if="${#strings.isEmpty(account?.profileImage)}" th:data-jdenticon-value="${#authentication.name}"
+               width="24" height="24" class="rounded border bg-light"></svg>
+          <img th:if="${!#strings.isEmpty(account?.profileImage)}" th:src="${account.profileImage}"
+               width="24" height="24" class="rounded border"/>
         </a>
         <!--  프로필 토글  -->
         <div class="dropdown-menu dropdown-menu-sm-right" aria-labelledby="userDropdown">
@@ -99,7 +102,7 @@
   </div>
 </footer>
 
-<!--  settings/profile에서 사용  -->
+<!--  settings/profile에서 사용 (왼쪽 사이드 바)-->
 <div th:fragment="settings-menu (currentMenu)" class="list-group">
   <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'profile'}? active" href="#" th:href="@{/settings/profile}">프로필</a>
   <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'password'}? active" href="#" th:href="@{/settings/password}">패스워드</a>

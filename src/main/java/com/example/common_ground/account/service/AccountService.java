@@ -4,6 +4,7 @@ import com.example.common_ground.account.Repository.AccountRepository;
 import com.example.common_ground.account.SignUpForm;
 import com.example.common_ground.account.entity.Account;
 import com.example.common_ground.account.entity.UserAccount;
+import com.example.common_ground.settings.Profile;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -139,4 +140,18 @@ public void sendSignUpConfirmEmail(Account newAccount) {
     login(account);
   }
 
+  public void updateProfile(Account account, Profile profile) {
+    account.setBio(profile.getBio());
+    account.setUrl(profile.getUrl());
+    account.setOccupation(profile.getOccupation());
+    account.setLocation(profile.getLocation());
+    account.setProfileImage(profile.getProfileImage());
+    accountRepository.save(account);
+  }
+
+  public void updatePassword(Account account, String newPassword) {
+    // 패스워드 수정시 패스워드 인코딩 후 저장
+    account.setPassword(passwordEncoder.encode(newPassword));
+    accountRepository.save(account);
+  }
 }
