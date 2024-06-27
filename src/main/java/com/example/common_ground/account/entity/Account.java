@@ -47,15 +47,15 @@ public class Account {
   // 스터디 개설, 이메일로 알림 받기
   private boolean studyCreatedByEmail;
   // 스터디 개설, 웹으로 알림 받기
-  private boolean studyCreatedByWeb;
+  private boolean studyCreatedByWeb = true;
   // 스터디 등록(가입), 이메일로 알림 받기
   private boolean studyEnrollmentResultByEmail;
   // 스터디 등록, 웹으로 알림 받기
-  private boolean studyEnrollmentResultByWeb;
+  private boolean studyEnrollmentResultByWeb = true;
   // 스터디 수정 정보, 이메일로 알림 받기
   private boolean studyUpdateByEmail;
   // 스터디 수정 정보, 웹으로 알림 받기
-  private boolean studyUpdateByWeb;
+  private boolean studyUpdateByWeb = true;
 
   // 가입된 정보로 토큰 생성
   public void generateEmailCheckToken() {
