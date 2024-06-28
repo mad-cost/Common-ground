@@ -1,5 +1,6 @@
-package com.example.common_ground.settings;
+package com.example.common_ground.settings.validator;
 
+import com.example.common_ground.settings.form.PasswordForm;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 

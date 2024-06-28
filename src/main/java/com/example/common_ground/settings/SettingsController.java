@@ -2,10 +2,16 @@ package com.example.common_ground.settings;
 
 import com.example.common_ground.account.controller.CurrentUser;
 import com.example.common_ground.account.entity.Account;
+import com.example.common_ground.account.entity.Tag;
 import com.example.common_ground.account.service.AccountService;
+import com.example.common_ground.settings.form.*;
+import com.example.common_ground.settings.validator.NicknameValidator;
+import com.example.common_ground.settings.validator.PasswordFormValidator;
+import com.example.common_ground.tag.TagRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -13,14 +19,18 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Optional;
+
 @Controller
 //@RequestMapping("/settings")
 @RequiredArgsConstructor
 public class SettingsController {
   private final AccountService accountService;
   private final ModelMapper modelMapper;
+  private final NicknameValidator nicknameValidator;
+  private final TagRepository tagRepository;
 
-  // 이렇게 사용하는 이유
+  // ▼ 이렇게 사용하는 이유
   // 유지보수: URL 경로를 상수로 정의해 두면, 나중에 경로를 변경해야 할 때 코드 전체를 일일이 찾아 변경할 필요 없이 상수만 수정하면 된다
   static final String SETTINGS_NOTIFICATIONS_VIEW_NAME = "settings/notifications";
   static final String SETTINGS_NOTIFICATIONS_URL = "/settings/notifications";
@@ -30,14 +40,28 @@ public class SettingsController {
 
   static final String SETTINGS_PROFILE_VIEW_NAME = "settings/profile";
   static final String SETTINGS_PROFILE_URL = "/settings/profile";
+
+  static final String SETTINGS_ACCOUNT_VIEW_NAME = "settings/account";
+  static final String SETTINGS_ACCOUNT_URL = "/" + SETTINGS_ACCOUNT_VIEW_NAME;
+  static final String SETTINGS_TAGS_VIEW_NAME = "settings/tags";
+  static final String SETTINGS_TAGS_URL = "/" + SETTINGS_TAGS_VIEW_NAME;
+
+
+
+
+
   // public: 패키지 밖에서도 사용가능 / protected: 같은 패키지 내부에서 사용가능, SettingsController를 상속 받는 자식 클래스에서도 사용 가능
   // default: 패키지 내에서만 사용가능, 상속 불가능 / private 클래스 내부에서만 사용
 
   @InitBinder("passwordForm")
-  public void initBinder(WebDataBinder webDataBinder){
+  public void passwordFormInitBinder(WebDataBinder webDataBinder) {
     webDataBinder.addValidators(new PasswordFormValidator());
   }
 
+  @InitBinder("nicknameForm")
+  public void nicknameFormInitBinder(WebDataBinder webDataBinder) {
+    webDataBinder.addValidators(nicknameValidator);
+  }
 
   @GetMapping(SETTINGS_PROFILE_URL)
   // @GetMapping("/settings/profile")
@@ -145,5 +169,67 @@ public class SettingsController {
     attributes.addFlashAttribute("message", "알림 설정을 변경했습니다.");
     return "redirect:" + SETTINGS_NOTIFICATIONS_URL;
   }
+
+
+  @GetMapping(SETTINGS_ACCOUNT_URL)
+  public String updateAccountForm(@CurrentUser Account account, Model model) {
+    model.addAttribute(account);
+    model.addAttribute(modelMapper.map(account, NicknameForm.class));
+    return SETTINGS_ACCOUNT_VIEW_NAME;
+  }
+
+  @PostMapping(SETTINGS_ACCOUNT_URL)
+  public String updateAccount(@CurrentUser Account account, @Valid NicknameForm nicknameForm, Errors errors,
+                              Model model, RedirectAttributes attributes) {
+    if (errors.hasErrors()) {
+      model.addAttribute(account);
+      return SETTINGS_ACCOUNT_VIEW_NAME;
+    }
+
+    accountService.updateNickname(account, nicknameForm.getNickname());
+    attributes.addFlashAttribute("message", "닉네임을 수정했습니다.");
+    return "redirect:" + SETTINGS_ACCOUNT_URL;
+  }
+
+  @GetMapping(SETTINGS_TAGS_URL)
+  public String updateTags(
+          @CurrentUser
+          Account account,
+          Model model
+  ){
+    model.addAttribute(account);
+    return SETTINGS_TAGS_VIEW_NAME;
+  }
+
+  @PostMapping("/settings/tags/add")
+  @ResponseBody // Ajax요청이기 때문 / HTTP 응답 본문으로 변환
+  public ResponseEntity addTags(
+          @CurrentUser
+          Account account,
+          Model model,
+          // tags.html에서 날라온 Key:Value형식의 Ajax데이터가 Body에 실려서 들어온다
+          // TagForm: Ajax 데이터를 받아줄 Form
+          @RequestBody
+          TagForm tagForm
+  ){
+    String title = tagForm.getTagTitle();
+    // title에 값이 없다면 저장
+//    Tag tag = tagRepository.findByTitle(title).orElseGet(() -> tagRepository.save(
+//            Tag.builder()
+//                    .title(tagForm.getTagTitle())
+//            .build()));
+    Tag tag = tagRepository.findByTitle(title);
+    if (tag == null){
+      tag = tagRepository.save(Tag.builder()
+              .title(tagForm.getTagTitle())
+              .build());
+    }
+    accountService.addTag(account, tag);
+    return ResponseEntity.ok().build();
+
+  }
+
+
+
 
 }

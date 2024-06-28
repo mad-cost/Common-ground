@@ -1,4 +1,4 @@
-package com.example.common_ground.settings;
+package com.example.common_ground.settings.form;
 
 import jakarta.validation.constraints.Size;
 import lombok.Data;

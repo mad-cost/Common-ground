@@ -1,4 +1,4 @@
-package com.example.common_ground.settings;
+package com.example.common_ground.settings.form;
 
 import com.example.common_ground.account.entity.Account;
 import jakarta.validation.constraints.Size;

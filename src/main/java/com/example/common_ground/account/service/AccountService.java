@@ -2,21 +2,18 @@ package com.example.common_ground.account.service;
 
 import com.example.common_ground.account.Repository.AccountRepository;
 import com.example.common_ground.account.SignUpForm;
-import com.example.common_ground.settings.Notifications;
+import com.example.common_ground.account.entity.Tag;
+import com.example.common_ground.settings.form.Notifications;
 import com.example.common_ground.account.entity.Account;
 import com.example.common_ground.account.entity.UserAccount;
-import com.example.common_ground.settings.Notifications;
-import com.example.common_ground.settings.Profile;
+import com.example.common_ground.settings.form.Profile;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -173,5 +171,19 @@ public void sendSignUpConfirmEmail(Account newAccount) {
 //    account.setStudyEnrollmentResultByEmail(notifications.isStudyEnrollmentResultByEmail());
 //    account.setStudyEnrollmentResultByWeb(notifications.isStudyEnrollmentResultByWeb());
     accountRepository.save(account);
+  }
+
+  public void updateNickname(Account account, String nickname) {
+    account.setNickname(nickname);
+    accountRepository.save(account);
+    login(account);
+  }
+
+  public void addTag(Account account, Tag tag) {
+    Optional<Account> byId = accountRepository.findById(account.getId());
+    // ifPresent: 값이 존재 할 경우 지정된 동작 (..)실행
+    byId.ifPresent(a -> a.getTags().add(tag));
+
+
   }
 }

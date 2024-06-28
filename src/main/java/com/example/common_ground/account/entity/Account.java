@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -56,6 +57,11 @@ public class Account {
   private boolean studyUpdateByEmail;
   // 스터디 수정 정보, 웹으로 알림 받기
   private boolean studyUpdateByWeb = true;
+
+  @ManyToMany
+  private Set<Tag> tags;
+
+
 
   // 가입된 정보로 토큰 생성
   public void generateEmailCheckToken() {
