@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -184,6 +185,12 @@ public void sendSignUpConfirmEmail(Account newAccount) {
     // ifPresent: 값이 존재 할 경우 지정된 동작 (..)실행
     byId.ifPresent(a -> a.getTags().add(tag));
 
+
+  }
+
+  public Set<Tag> getTags(Account account) {
+    Optional<Account> byId = accountRepository.findById(account.getId());
+    return byId.orElseThrow().getTags();
 
   }
 }
