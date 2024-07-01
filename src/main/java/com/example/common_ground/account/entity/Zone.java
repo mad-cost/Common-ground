@@ -23,7 +23,10 @@ public class Zone {
   @Column(nullable = true)
   private String province; // ex)North Gyeongsang (경상 북도)
 
-
+  @Override
+  public String toString() {
+    return String.format("%s(%s)/%s", city, localNameOfCity, province);
+  }
 }
 
 

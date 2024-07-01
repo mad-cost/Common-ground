@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 // @Profile("local"): "local"이라는 프로파일(yaml)이 활성화된 경우에만 해당 빈이 등록되고 사용될 수 있음을 의미
-@Profile("local")
+@Profile({"local"})
 @Component
 @Slf4j
 public class ConsoleMailSender implements JavaMailSender {

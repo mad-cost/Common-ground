@@ -54,6 +54,10 @@ dependencies {
 
 	// ModelMapper 의존성 추가
 	implementation 'org.modelmapper:modelmapper:3.1.1'
+
+	// mysql
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	implementation 'com.mysql:mysql-connector-j'
 }
 
 tasks.named('test') {

@@ -3,11 +3,14 @@ package com.example.common_ground.settings;
 import com.example.common_ground.account.controller.CurrentUser;
 import com.example.common_ground.account.entity.Account;
 import com.example.common_ground.account.entity.Tag;
+import com.example.common_ground.account.entity.Zone;
 import com.example.common_ground.account.service.AccountService;
 import com.example.common_ground.settings.form.*;
 import com.example.common_ground.settings.validator.NicknameValidator;
 import com.example.common_ground.settings.validator.PasswordFormValidator;
 import com.example.common_ground.tag.TagRepository;
+import com.example.common_ground.zone.ZoneRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +35,8 @@ public class SettingsController {
   private final ModelMapper modelMapper;
   private final NicknameValidator nicknameValidator;
   private final TagRepository tagRepository;
+  private final ZoneRepository zoneRepository;
+
 
   // ▼ 이렇게 사용하는 이유
   // 유지보수: URL 경로를 상수로 정의해 두면, 나중에 경로를 변경해야 할 때 코드 전체를 일일이 찾아 변경할 필요 없이 상수만 수정하면 된다
@@ -47,7 +53,7 @@ public class SettingsController {
   static final String SETTINGS_ACCOUNT_URL = "/" + SETTINGS_ACCOUNT_VIEW_NAME;
   static final String SETTINGS_TAGS_VIEW_NAME = "settings/tags";
   static final String SETTINGS_TAGS_URL = "/" + SETTINGS_TAGS_VIEW_NAME;
-
+  static final String ZONES = "/zones";
 
 
 
@@ -232,7 +238,6 @@ public class SettingsController {
     return ResponseEntity.ok().build();
 
   }
-
 
 
 

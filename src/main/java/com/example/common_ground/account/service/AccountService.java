@@ -3,6 +3,7 @@ package com.example.common_ground.account.service;
 import com.example.common_ground.account.Repository.AccountRepository;
 import com.example.common_ground.account.SignUpForm;
 import com.example.common_ground.account.entity.Tag;
+import com.example.common_ground.account.entity.Zone;
 import com.example.common_ground.settings.form.Notifications;
 import com.example.common_ground.account.entity.Account;
 import com.example.common_ground.account.entity.UserAccount;
@@ -191,6 +192,20 @@ public void sendSignUpConfirmEmail(Account newAccount) {
   public Set<Tag> getTags(Account account) {
     Optional<Account> byId = accountRepository.findById(account.getId());
     return byId.orElseThrow().getTags();
+  }
 
+  public Set<Zone> getZones(Account account) {
+    Optional<Account> byId = accountRepository.findById(account.getId());
+    return byId.orElseThrow().getZones();
+  }
+
+  public void addZone(Account account, Zone zone) {
+    Optional<Account> byId = accountRepository.findById(account.getId());
+    byId.ifPresent(a -> a.getZones().add(zone));
+  }
+
+  public void removeZone(Account account, Zone zone) {
+    Optional<Account> byId = accountRepository.findById(account.getId());
+    byId.ifPresent(a -> a.getZones().remove(zone));
   }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -60,6 +61,9 @@ public class Account {
 
   @ManyToMany
   private Set<Tag> tags;
+
+  @ManyToMany
+  private Set<Zone> zones = new HashSet<>();
 
 
 
